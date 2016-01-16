@@ -8498,6 +8498,17 @@ See URL `https://github.com/commercialhaskell/stack'."
     (flycheck-sanitize-errors (flycheck-dedent-error-messages errors)))
   :modes (haskell-mode literate-haskell-mode)
   :next-checkers ((warning . haskell-hlint))
+  :predicate
+  (lambda ()
+    (let ((file-names (list "stack.yml" "stack.yaml" (getenv "STACK_YAML")))
+          (buf-file-name (buffer-file-name)))
+      (and buf-file-name
+           (locate-dominating-file
+            buf-file-name (lambda (dir)
+                            (seq-some (lambda (file)
+                                        (and file (file-exists-p
+                                                   (expand-file-name file dir))))
+                                      file-names))))))
   :working-directory flycheck-haskell--find-default-directory)
 
 (flycheck-define-checker haskell-ghc
